@@ -19,52 +19,12 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     }
     
     func formulateRequest(initialUrl: String) async -> String {
-        var result = initialUrl
-        var afData = ""
-        
-        if !AppDelegate.subParams.isEmpty {
-            afData += "?\(AppDelegate.subParams)"
-        }
-        
-        if !AppDelegate.afid.isEmpty {
-            afData += "\(afData.isEmpty ? "?" : "&")afid=\(AppDelegate.afid)"
-        }
-        
-        if !afData.isEmpty {
-            if result.contains("?") {
-                result = "\(result)\(afData)"
-            } else {
-                result = "\(result)\(afData)"
-            }
-        }
+        let result = initialUrl
         return result
     }
     
-    func resolveAFContinuation() {
-        guard let continuation = afContinuation else { return }
-        afContinuation = nil
-        continuation.resume()
-    }
-
     func initApp() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            ATTrackingManager.requestTrackingAuthorization(completionHandler: { status in
-                print("Tracking authorization status: \(status)")
-                DispatchQueue.main.async {
-                    Task { @MainActor in
-                        await withCheckedContinuation { continuation in
-                            self.afContinuation = continuation
-                            self.initAppsFlyer()
-                            Task { @MainActor in
-                                try? await Task.sleep(for: .seconds(5))
-                                self.resolveAFContinuation()
-                            }
-                        }
-                        self.applyDecision()
-                    }
-                }
-            })
-        }
+        self.applyDecision()
     }
     
     func applyDecision() {
@@ -87,12 +47,15 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                     
                     if let logo = loadingVC.view.viewWithTag(1) as? UIImageView {
                         let pulseAnimation = CABasicAnimation(keyPath: "transform.scale")
-                        pulseAnimation.duration = 1.1
+                        
+                        pulseAnimation.duration = 1.5
                         pulseAnimation.fromValue = 1
-                        pulseAnimation.toValue = 0.75
+                        pulseAnimation.toValue = 0.8
+                        
                         pulseAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
                         pulseAnimation.autoreverses = true
                         pulseAnimation.repeatCount = .infinity
+                        
                         logo.layer.add(pulseAnimation, forKey: "pulse")
                     }
                 }

@@ -2,7 +2,6 @@ import Foundation
 import UIKit
 
 public class WebManager {
-    
     static let initialURL = "https://tappyhabitbirda.biz/user"
     static let savedUrlKey = "savedUrl"
     static var provenUrl : URL?
@@ -51,8 +50,7 @@ public class WebManager {
         return finalURL
     }
     
-    static func getSavedUrl() -> String
-    {
+    static func getSavedUrl() -> String {
         let storage = UserDefaults.standard
         if let urlString = storage.string(forKey: savedUrlKey) {
                 if let url = URL(string: urlString) {
